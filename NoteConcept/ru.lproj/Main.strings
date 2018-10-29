@@ -1,0 +1,9 @@
+
+/* Class = "UILabel"; text = "Нет заметок"; ObjectID = "bVB-UE-6vP"; */
+"bVB-UE-6vP.text" = "Нет заметок";
+
+/* Class = "UIButton"; normalTitle = "Развернуть все"; ObjectID = "liU-pc-bMD"; */
+"liU-pc-bMD.normalTitle" = "Развернуть все";
+
+/* Class = "UINavigationItem"; title = "Заметки"; ObjectID = "tUd-Wq-Y5l"; */
+"tUd-Wq-Y5l.title" = "Заметки";

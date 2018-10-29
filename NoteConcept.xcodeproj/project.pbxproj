@@ -13,9 +13,12 @@
 		845CC5872181D88100B823BD /* NoteConcept.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 845CC5852181D88100B823BD /* NoteConcept.xcdatamodeld */; };
 		845CC5892181D88300B823BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 845CC5882181D88300B823BD /* Assets.xcassets */; };
 		845CC58C2181D88300B823BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 845CC58A2181D88300B823BD /* LaunchScreen.storyboard */; };
+		845CC596218324D500B823BD /* NoteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845CC595218324D500B823BD /* NoteTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8426680F2186339300CF960E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		842668112186339500CF960E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
 		845CC57B2181D88100B823BD /* NoteConcept.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NoteConcept.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		845CC57E2181D88100B823BD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		845CC5802181D88100B823BD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -24,6 +27,8 @@
 		845CC5882181D88300B823BD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		845CC58B2181D88300B823BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		845CC58D2181D88300B823BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		845CC595218324D500B823BD /* NoteTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTableViewCell.swift; sourceTree = "<group>"; };
+		84E23D1A2184B507005F6461 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +63,7 @@
 			children = (
 				845CC57E2181D88100B823BD /* AppDelegate.swift */,
 				845CC5802181D88100B823BD /* ViewController.swift */,
+				845CC595218324D500B823BD /* NoteTableViewCell.swift */,
 				845CC5822181D88100B823BD /* Main.storyboard */,
 				845CC5882181D88300B823BD /* Assets.xcassets */,
 				845CC58A2181D88300B823BD /* LaunchScreen.storyboard */,
@@ -77,6 +83,7 @@
 				845CC5772181D88100B823BD /* Sources */,
 				845CC5782181D88100B823BD /* Frameworks */,
 				845CC5792181D88100B823BD /* Resources */,
+				84E23D1B21861D22005F6461 /* Build Number Autoincrement */,
 			);
 			buildRules = (
 			);
@@ -109,6 +116,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = 845CC5722181D88100B823BD;
 			productRefGroup = 845CC57C2181D88100B823BD /* Products */;
@@ -133,6 +141,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		84E23D1B21861D22005F6461 /* Build Number Autoincrement */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Number Autoincrement";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		845CC5772181D88100B823BD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -141,6 +170,7 @@
 				845CC5872181D88100B823BD /* NoteConcept.xcdatamodeld in Sources */,
 				845CC5812181D88100B823BD /* ViewController.swift in Sources */,
 				845CC57F2181D88100B823BD /* AppDelegate.swift in Sources */,
+				845CC596218324D500B823BD /* NoteTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,6 +181,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				845CC5832181D88100B823BD /* Base */,
+				8426680F2186339300CF960E /* en */,
+				842668112186339500CF960E /* ru */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -159,6 +191,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				845CC58B2181D88300B823BD /* Base */,
+				84E23D1A2184B507005F6461 /* ru */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -170,6 +203,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -231,6 +265,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -286,17 +321,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 9SR6C9RNX9;
 				INFOPLIST_FILE = NoteConcept/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.iHope.NoteConcept;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iHope.React;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = React;
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -304,17 +341,19 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 9SR6C9RNX9;
 				INFOPLIST_FILE = NoteConcept/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.iHope.NoteConcept;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iHope.React;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = React;
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
