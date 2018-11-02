@@ -10,27 +10,31 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBOutlet weak var addNewNoteButton: UIButton!
     @IBOutlet weak var textViewHeight: NSLayoutConstraint!
     @IBOutlet weak var searchNotesBar: UISearchBar!
+    @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var tableViewBottomConstraint: NSLayoutConstraint!
     
+
     private var notesArray: [NSManagedObject] = []
     private var dateArray: [NSManagedObject] = []
     private var searchNotes: [NSManagedObject] = []
     private var activityViewController: UIActivityViewController? = nil
     private let formatDate = DateFormatter()
-
+    private let toolbar = UIToolbar()
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         //move up textField
         
-        NotificationCenter.default.addObserver(self, selector: #selector(ViewController.textViewDidBeginEditing), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(ViewController.keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ViewController.handleKeyboard), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ViewController.handleKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
         
         newNoteTextView.layer.borderColor = UIColor.gray.cgColor
         newNoteTextView.layer.borderWidth = 1
         
         //done button above keyboard
         
-        let toolbar = UIToolbar()
         toolbar.sizeToFit()
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: self, action: #selector(doneButtonAction))
@@ -46,73 +50,33 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
     }
     
+    //MARK: - Show/Hide keyboard
+    
+    @objc func handleKeyboard(notification: NSNotification) {
+        if let userInfo = notification.userInfo {
+        
+            guard let keyboardSize = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+            let keyboardFrame = keyboardSize.cgRectValue
+            
+            let isKeyboardShowing = notification.name == UIResponder.keyboardWillShowNotification
+            bottomConstraint.constant = isKeyboardShowing ? +keyboardFrame.height + 10 : 0
+            tableViewBottomConstraint.constant = isKeyboardShowing ? +keyboardFrame.height + 10 : 87
+            
+            UIView.animate(withDuration: 0, delay: 0, options: .curveEaseOut, animations: {
+                self.view.layoutIfNeeded()
+                }, completion: { (completed) in
+            
+            })
+        }
+    }
+    
     @IBAction func addNewNoteButtonAction(_ sender: UIButton) {
         newNoteTextView.isHidden = false
         sender.isHidden = true
         rollUpCellsButton.isHidden = true
         notesTableView.isHidden = true
+        noNotesLabel.isHidden = true
         newNoteTextView.becomeFirstResponder()
-    }
-    
-    private var flag = true
-    
-    @IBAction func rollUpCellsButtonAction(_ sender: UIButton) {
-        
-        if !flag {
-            self.notesTableView.beginUpdates()
-            flag = true
-            self.notesTableView.endUpdates()
-            sender.setTitle("Развернуть все", for: .normal)
-        } else {
-            self.notesTableView.beginUpdates()
-            flag = false
-            self.notesTableView.endUpdates()
-            sender.setTitle("Свернуть все", for: .normal)
-        }
-        view.endEditing(true)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        fetch()
-        
-        //hide empty cells
-        if notesTableView.visibleCells.isEmpty {
-            notesTableView.isHidden = true
-            noNotesLabel.isHidden = false
-            rollUpCellsButton.isHidden = true
-        } else {
-            notesTableView.isHidden = false
-            noNotesLabel.isHidden = true
-            rollUpCellsButton.isHidden = false
-        }
-        notesTableView.tableFooterView = UIView()
-        
-    }
-    
-    //MARK: - TextView
-    
-    @objc func doneButtonAction() {
-        if let newText = newNoteTextView.text {
-            formatDate.dateFormat = "dd.MM.yy, HH:mm"
-            let currentDate = formatDate.string(from: Date())
-            formatDate.dateFormat = "dd.MM.yy, HH:mm:ss"
-            let fullCurrentDate = formatDate.string(from: Date())
-                if newText != "" {
-                    self.save(note: newText, date: currentDate, formData: fullCurrentDate)
-                    notesTableView.reloadData()
-                }
-        }
-        if !notesTableView.visibleCells.isEmpty {
-            notesTableView.isHidden = false
-            noNotesLabel.isHidden = true
-            rollUpCellsButton.isHidden = false
-        }
-        newNoteTextView.text = ""
-        view.endEditing(true)
-        newNoteTextView.isHidden = true
-        addNewNoteButton.isHidden = false
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -136,6 +100,72 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         newNoteTextView.resignFirstResponder()
         newNoteTextView.isHidden = true
         addNewNoteButton.isHidden = false
+    }
+    
+    //MARK: - TextView
+    
+    @objc func doneButtonAction() {
+        if let newText = newNoteTextView.text {
+            formatDate.dateFormat = "dd.MM.yy, HH:mm"
+            let currentDate = formatDate.string(from: Date())
+            formatDate.dateFormat = "dd.MM.yy, HH:mm:ss"
+            let fullCurrentDate = formatDate.string(from: Date())
+            if newText != "" {
+                self.save(note: newText, date: currentDate, formData: fullCurrentDate)
+                notesTableView.reloadData()
+            }
+        }
+        
+        if !notesTableView.visibleCells.isEmpty {
+            notesTableView.isHidden = false
+            noNotesLabel.isHidden = true
+            rollUpCellsButton.isHidden = false
+        }
+        newNoteTextView.text = ""
+        view.endEditing(true)
+        newNoteTextView.isHidden = true
+        addNewNoteButton.isHidden = false
+    }
+    
+    //MARK: - Roll All Cells Button
+    
+    private var flag = true
+    
+    @IBAction func rollUpCellsButtonAction(_ sender: UIButton) {
+        
+        if !flag {
+            self.notesTableView.beginUpdates()
+            flag = true
+            self.notesTableView.endUpdates()
+            sender.setTitle("Развернуть все", for: .normal)
+        } else {
+            self.notesTableView.beginUpdates()
+            flag = false
+            self.notesTableView.endUpdates()
+            sender.setTitle("Свернуть все", for: .normal)
+        }
+        view.endEditing(true)
+    }
+    
+    //MARK: - viewWillAppear
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        fetch()
+        
+        //hide empty cells
+        if notesTableView.visibleCells.isEmpty {
+            notesTableView.isHidden = true
+            noNotesLabel.isHidden = false
+            rollUpCellsButton.isHidden = true
+        } else {
+            notesTableView.isHidden = false
+            noNotesLabel.isHidden = true
+            rollUpCellsButton.isHidden = false
+        }
+        notesTableView.tableFooterView = UIView()
+        
     }
     
     //MARK: - Save Notes
@@ -179,13 +209,52 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
+    //MARK: - Update Data ...not work
+    
+    private func update(note: String, date: String, formData: String) {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let context = appDelegate.persistentContainer.viewContext
+        
+        let request: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Notes")
+        request.predicate = NSPredicate(format: "note = %@", note)
+        do {
+            let testNote = try context.fetch(request)
+            
+            let objectUpdate = testNote[0] as! NSManagedObject
+            objectUpdate.setValue(note, forKey: "note")
+            objectUpdate.setValue(date, forKey: "date")
+            objectUpdate.setValue(formData, forKey: "formatData")
+            do {
+                try context.save()
+//                notesArray[index].value
+                print("saved")
+            } catch {
+                print("Error save")
+            }
+        } catch {
+            print("Error")
+        }
+        notesTableView.reloadData()
+    }
+    
     //MARK: - TableView
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notesArray.count
     }
     
+    var myIndexPath = IndexPath()
+    @IBAction func saveUpdateDataAction(_ sender: UIBarButtonItem) {
+        let cell = notesTableView.dequeueReusableCell(withIdentifier: "cell", for: myIndexPath) as! NoteTableViewCell
+        formatDate.dateFormat = "dd.MM.yy, HH:mm"
+        let currentDate = formatDate.string(from: Date())
+        formatDate.dateFormat = "dd.MM.yy, HH:mm:ss"
+        let fullCurrentDate = formatDate.string(from: Date())
+        update(note: cell.newNoteTextView.text, date: currentDate, formData: fullCurrentDate)
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        myIndexPath = indexPath
         let cell = notesTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! NoteTableViewCell
         
         let notes = notesArray[indexPath.row]
@@ -194,6 +263,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let date = dateArray[indexPath.row]
         cell.getCurrentTimeLabel?.text = date.value(forKey: "date") as? String
         
+        cell.newNoteTextView.inputAccessoryView = toolbar
+//        let numLines = (cell.newNoteTextView.contentSize.height / cell.newNoteTextView.font!.lineHeight) as? Int
+//        if numLines! > 2 {
+//            print(numLines)
+//            cell.rollUpCellButton.isHidden = false
+//        }
         return cell
     }
     
@@ -214,7 +289,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        
         let delete = UITableViewRowAction(style: .destructive, title: "Удалить") { (action, indexPath) in
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
             let context = appDelegate.persistentContainer.viewContext
@@ -239,6 +313,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
         }
         
+//        func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//            view.endEditing(true)
+//        }
+        
         let share = UITableViewRowAction(style: .normal, title: "Отправить") { (action, indexPath) in
             let notes = self.notesArray[indexPath.row]
             let text = notes.value(forKey: "note") as? String
@@ -260,6 +338,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 //MARK: - Resizable TextView
 
 extension ViewController: UITextViewDelegate {
+    
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if newNoteTextView.contentSize.height < textViewHeight.constant {
             newNoteTextView.isScrollEnabled = false
@@ -267,20 +346,6 @@ extension ViewController: UITextViewDelegate {
             newNoteTextView.isScrollEnabled = true
         }
         return true
-    }
-    
-    @objc func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView == newNoteTextView {
-            self.view.frame.origin.y = -70
-        }
-    }
-    
-    func textViewDidEndEditing(_ textView: UITextView) {    
-        self.view.frame.origin.y = 0
-    }
-    
-    @objc func keyboardWillHide(sender: NSNotification) {
-        self.view.frame.origin.y = 0
     }
 }
 
@@ -315,7 +380,7 @@ extension ViewController: UISearchBarDelegate, UISearchDisplayDelegate {
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
 //        searchNotesBar.text = ""
 //        fetch()
-//        searchNotesBar.resignFirstResponder()
+        searchNotesBar.resignFirstResponder()
 //        notesTableView.reloadData()
     }
     
