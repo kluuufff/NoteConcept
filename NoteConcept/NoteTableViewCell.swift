@@ -12,7 +12,6 @@ class NoteTableViewCell: UITableViewCell {
 
     @IBOutlet weak var newNoteTextView: UITextView!
     @IBOutlet weak var getCurrentTimeLabel: UILabel!
-    @IBOutlet weak var rollUpCellButton: UIButton!
     @IBOutlet weak var newNoteHeightContraint: NSLayoutConstraint!
     
     override func awakeFromNib() {

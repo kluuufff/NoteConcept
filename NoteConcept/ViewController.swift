@@ -20,6 +20,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     private var activityViewController: UIActivityViewController? = nil
     private let formatDate = DateFormatter()
     private let toolbar = UIToolbar()
+    private var myId = 0
     
     
     override func viewDidLoad() {
@@ -87,8 +88,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             formatDate.dateFormat = "dd.MM.yy, HH:mm:ss"
             let fullCurrentDate = formatDate.string(from: Date())
             if newText != "" {
-                self.save(note: newText, date: currentDate, formData: fullCurrentDate)
-                notesTableView.reloadData()
+                myId += 1
+                self.save(id: myId, note: newText, date: currentDate, formData: fullCurrentDate)
             }
         }
         if !notesTableView.visibleCells.isEmpty {
@@ -111,11 +112,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             formatDate.dateFormat = "dd.MM.yy, HH:mm:ss"
             let fullCurrentDate = formatDate.string(from: Date())
             if newText != "" {
-                self.save(note: newText, date: currentDate, formData: fullCurrentDate)
-                notesTableView.reloadData()
+                myId += 1
+                self.save(id: myId, note: newText, date: currentDate, formData: fullCurrentDate)
             }
         }
-        
         if !notesTableView.visibleCells.isEmpty {
             notesTableView.isHidden = false
             noNotesLabel.isHidden = true
@@ -165,18 +165,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             rollUpCellsButton.isHidden = false
         }
         notesTableView.tableFooterView = UIView()
-        
     }
     
     //MARK: - Save Notes
     
-    private func save(note: String, date: String, formData: String) {
+    private func save(id: Int, note: String, date: String, formData: String) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
         let entity_note = NSEntityDescription.entity(forEntityName: "Notes", in: context)
         
         let newNote = NSManagedObject(entity: entity_note!, insertInto: context)
         
+        newNote.setValue(id, forKey: "id")
         newNote.setValue(note, forKey: "note")
         newNote.setValue(date, forKey: "date")
         newNote.setValue(formData, forKey: "formatData")
@@ -188,7 +188,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         } catch {
             print("Error")
         }
-        fetch()
         notesTableView.reloadData()
     }
     
@@ -211,22 +210,22 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     //MARK: - Update Data ...not work
     
-    private func update(note: String, date: String, formData: String) {
+    private func update(id: Int, note: String, date: String, formData: String) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
         
         let request: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Notes")
-        request.predicate = NSPredicate(format: "note = %@", note)
+        request.predicate = NSPredicate(format: "id = \(id)")
         do {
             let testNote = try context.fetch(request)
             
             let objectUpdate = testNote[0] as! NSManagedObject
+            print("testNote: \(testNote)")
             objectUpdate.setValue(note, forKey: "note")
             objectUpdate.setValue(date, forKey: "date")
             objectUpdate.setValue(formData, forKey: "formatData")
             do {
                 try context.save()
-//                notesArray[index].value
                 print("saved")
             } catch {
                 print("Error save")
@@ -243,34 +242,37 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return notesArray.count
     }
     
-    var myIndexPath = IndexPath()
+    private var myIndexPath = IndexPath()
+    
+    //MARK: - Update Button
+    
     @IBAction func saveUpdateDataAction(_ sender: UIBarButtonItem) {
         let cell = notesTableView.dequeueReusableCell(withIdentifier: "cell", for: myIndexPath) as! NoteTableViewCell
         formatDate.dateFormat = "dd.MM.yy, HH:mm"
         let currentDate = formatDate.string(from: Date())
         formatDate.dateFormat = "dd.MM.yy, HH:mm:ss"
         let fullCurrentDate = formatDate.string(from: Date())
-        update(note: cell.newNoteTextView.text, date: currentDate, formData: fullCurrentDate)
+        update(id: myIndexPath.row, note: cell.newNoteTextView.text, date: currentDate, formData: fullCurrentDate)
     }
+    
+    //MARK: - cellForRowAt
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         myIndexPath = indexPath
         let cell = notesTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! NoteTableViewCell
-        
         let notes = notesArray[indexPath.row]
-        cell.newNoteTextView?.text = notes.value(forKey: "note") as? String
         
+        
+        cell.newNoteTextView?.text = notes.value(forKey: "note") as? String
         let date = dateArray[indexPath.row]
         cell.getCurrentTimeLabel?.text = date.value(forKey: "date") as? String
-        
         cell.newNoteTextView.inputAccessoryView = toolbar
-//        let numLines = (cell.newNoteTextView.contentSize.height / cell.newNoteTextView.font!.lineHeight) as? Int
-//        if numLines! > 2 {
-//            print(numLines)
-//            cell.rollUpCellButton.isHidden = false
-//        }
         return cell
     }
+    
+//    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        view.endEditing(true)
+//    }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if flag {
@@ -312,10 +314,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 tableView.endUpdates()
             }
         }
-        
-//        func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//            view.endEditing(true)
-//        }
         
         let share = UITableViewRowAction(style: .normal, title: "Отправить") { (action, indexPath) in
             let notes = self.notesArray[indexPath.row]
