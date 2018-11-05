@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		842ABB6F219084D400FBB28F /* Notes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842ABB6E219084D400FBB28F /* Notes.swift */; };
 		845CC57F2181D88100B823BD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845CC57E2181D88100B823BD /* AppDelegate.swift */; };
 		845CC5812181D88100B823BD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845CC5802181D88100B823BD /* ViewController.swift */; };
 		845CC5842181D88100B823BD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 845CC5822181D88100B823BD /* Main.storyboard */; };
@@ -19,6 +20,7 @@
 /* Begin PBXFileReference section */
 		8426680F2186339300CF960E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		842668112186339500CF960E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
+		842ABB6E219084D400FBB28F /* Notes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notes.swift; sourceTree = "<group>"; };
 		845CC57B2181D88100B823BD /* NoteConcept.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NoteConcept.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		845CC57E2181D88100B823BD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		845CC5802181D88100B823BD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 				845CC57E2181D88100B823BD /* AppDelegate.swift */,
 				845CC5802181D88100B823BD /* ViewController.swift */,
 				845CC595218324D500B823BD /* NoteTableViewCell.swift */,
+				842ABB6E219084D400FBB28F /* Notes.swift */,
 				845CC5822181D88100B823BD /* Main.storyboard */,
 				845CC5882181D88300B823BD /* Assets.xcassets */,
 				845CC58A2181D88300B823BD /* LaunchScreen.storyboard */,
@@ -168,6 +171,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				845CC5872181D88100B823BD /* NoteConcept.xcdatamodeld in Sources */,
+				842ABB6F219084D400FBB28F /* Notes.swift in Sources */,
 				845CC5812181D88100B823BD /* ViewController.swift in Sources */,
 				845CC57F2181D88100B823BD /* AppDelegate.swift in Sources */,
 				845CC596218324D500B823BD /* NoteTableViewCell.swift in Sources */,

@@ -1,8 +1,22 @@
+//
+//  ViewController.swift
+//  NoteConcept
+//
+//  Created by Nadiya on 10/25/18.
+//  Copyright © 2018 Nadiya. All rights reserved.
+//
+
+//MARK: - Import Libraries
+
 import UIKit
 import CoreData
 
+//MARK: - Main Class ViewController
+
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
+    //MARK: - @IBOutlets
+    
     @IBOutlet weak var notesTableView: UITableView!
     @IBOutlet weak var newNoteTextView: UITextView!
     @IBOutlet weak var noNotesLabel: UILabel!
@@ -12,16 +26,19 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBOutlet weak var searchNotesBar: UISearchBar!
     @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var tableViewBottomConstraint: NSLayoutConstraint!
-    
 
-    private var notesArray: [NSManagedObject] = []
-    private var dateArray: [NSManagedObject] = []
-    private var searchNotes: [NSManagedObject] = []
+    //MARK: - Variables & Constants
+
+    private var myItems: [Notes] = []
     private var activityViewController: UIActivityViewController? = nil
     private let formatDate = DateFormatter()
     private let toolbar = UIToolbar()
+    private var flag = true
+    private var isEditState = false
+    private var indexPathId = 0
     private var myId = 0
     
+    //MARK: - viewDidLoad
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,8 +64,29 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         notesTableView.tableHeaderView = searchNotesBar
         
-        notesTableView.setContentOffset(CGPoint.init(x: 0, y: 44), animated: false)
+//        notesTableView.setContentOffset(CGPoint.init(x: 0, y: 56), animated: false)
         
+    }
+    
+    //MARK: - viewWillAppear
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        fetch()
+        myId = myItems.first?.id as! Int
+        
+        //hide empty cells
+        if notesTableView.visibleCells.isEmpty {
+            notesTableView.isHidden = true
+            noNotesLabel.isHidden = false
+            rollUpCellsButton.isHidden = true
+        } else {
+            notesTableView.isHidden = false
+            noNotesLabel.isHidden = true
+            rollUpCellsButton.isHidden = false
+        }
+        notesTableView.tableFooterView = UIView()
     }
     
     //MARK: - Show/Hide keyboard
@@ -71,6 +109,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
+    //MARK: - Add new note Button
+    
     @IBAction func addNewNoteButtonAction(_ sender: UIButton) {
         newNoteTextView.isHidden = false
         sender.isHidden = true
@@ -80,16 +120,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         newNoteTextView.becomeFirstResponder()
     }
     
+    //MARK: - Touch for Hide Keyboard
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
         if let newText = newNoteTextView.text {
-            formatDate.dateFormat = "dd.MM.yy, HH:mm"
-            let currentDate = formatDate.string(from: Date())
-            formatDate.dateFormat = "dd.MM.yy, HH:mm:ss"
-            let fullCurrentDate = formatDate.string(from: Date())
             if newText != "" {
                 myId += 1
-                self.save(id: myId, note: newText, date: currentDate, formData: fullCurrentDate)
+                self.save()
             }
         }
         if !notesTableView.visibleCells.isEmpty {
@@ -103,17 +141,13 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         addNewNoteButton.isHidden = false
     }
     
-    //MARK: - TextView
+    //MARK: - Press Done Button for Hide Keyboard
     
     @objc func doneButtonAction() {
         if let newText = newNoteTextView.text {
-            formatDate.dateFormat = "dd.MM.yy, HH:mm"
-            let currentDate = formatDate.string(from: Date())
-            formatDate.dateFormat = "dd.MM.yy, HH:mm:ss"
-            let fullCurrentDate = formatDate.string(from: Date())
             if newText != "" {
                 myId += 1
-                self.save(id: myId, note: newText, date: currentDate, formData: fullCurrentDate)
+                self.save()
             }
         }
         if !notesTableView.visibleCells.isEmpty {
@@ -128,8 +162,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     //MARK: - Roll All Cells Button
-    
-    private var flag = true
     
     @IBAction func rollUpCellsButtonAction(_ sender: UIButton) {
         
@@ -147,47 +179,27 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         view.endEditing(true)
     }
     
-    //MARK: - viewWillAppear
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        fetch()
-        
-        //hide empty cells
-        if notesTableView.visibleCells.isEmpty {
-            notesTableView.isHidden = true
-            noNotesLabel.isHidden = false
-            rollUpCellsButton.isHidden = true
-        } else {
-            notesTableView.isHidden = false
-            noNotesLabel.isHidden = true
-            rollUpCellsButton.isHidden = false
-        }
-        notesTableView.tableFooterView = UIView()
-    }
-    
     //MARK: - Save Notes
     
-    private func save(id: Int, note: String, date: String, formData: String) {
+    private func save() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
-        let entity_note = NSEntityDescription.entity(forEntityName: "Notes", in: context)
+        let myItem = NSEntityDescription.insertNewObject(forEntityName: "Notes", into: context) as! Notes
         
-        let newNote = NSManagedObject(entity: entity_note!, insertInto: context)
+        formatDate.dateFormat = "dd.MM.yy, HH:mm"
+        let currentDate = formatDate.string(from: Date())
+        print("current data: \(currentDate)")
         
-        newNote.setValue(id, forKey: "id")
-        newNote.setValue(note, forKey: "note")
-        newNote.setValue(date, forKey: "date")
-        newNote.setValue(formData, forKey: "formatData")
+        myItem.note = newNoteTextView.text
+        myItem.id = myId as NSNumber
+        myItem.date = currentDate
         
         do {
             try context.save()
-            notesArray.append(newNote)
-            dateArray.append(newNote)
         } catch {
             print("Error")
         }
+        fetch()
         notesTableView.reloadData()
     }
     
@@ -196,12 +208,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     private func fetch() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
-        let request_note = NSFetchRequest<NSManagedObject>(entityName: "Notes")
-        request_note.sortDescriptors = [NSSortDescriptor(key: "formatData", ascending: false)]
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Notes")
+        let sortDescriptor = NSSortDescriptor(key: "id", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
         
         do {
-            notesArray = try context.fetch(request_note)
-            dateArray = try context.fetch(request_note)
+            myItems = try context.fetch(fetchRequest) as! [Notes]
             notesTableView.reloadData()
         } catch {
             print("Error")
@@ -210,77 +222,74 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     //MARK: - Update Data ...not work
     
-    private func update(id: Int, note: String, date: String, formData: String) {
+    private func update() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
         
-        let request: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest.init(entityName: "Notes")
-        request.predicate = NSPredicate(format: "id = \(id)")
+        let note = myItems[indexPathId] as NSManagedObject
+        
+        note.setValue(newNoteTextView.text, forKey: "note")
+        
         do {
-            let testNote = try context.fetch(request)
-            
-            let objectUpdate = testNote[0] as! NSManagedObject
-            print("testNote: \(testNote)")
-            objectUpdate.setValue(note, forKey: "note")
-            objectUpdate.setValue(date, forKey: "date")
-            objectUpdate.setValue(formData, forKey: "formatData")
-            do {
-                try context.save()
-                print("saved")
-            } catch {
-                print("Error save")
-            }
+            try context.save()
+            notesTableView.reloadData()
         } catch {
             print("Error")
         }
-        notesTableView.reloadData()
+    }
+    
+    //MARK: - Update Button
+    
+    @IBAction func saveUpdateDataAction(_ sender: UIBarButtonItem) {
+        
+        if isEditState {
+            update()
+            if !notesTableView.visibleCells.isEmpty {
+                notesTableView.isHidden = false
+                noNotesLabel.isHidden = true
+                rollUpCellsButton.isHidden = false
+            }
+            view.endEditing(true)
+            newNoteTextView.isHidden = true
+            addNewNoteButton.isHidden = false
+            isEditState = false
+        } else {
+            let alert = UIAlertController(title: "Ошибка!", message: "Заметка не выбрана!", preferredStyle: .alert)
+            let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+            alert.addAction(action)
+            present(alert, animated: true, completion: nil)
+        }
+        
     }
     
     //MARK: - TableView
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return notesArray.count
-    }
-    
-    private var myIndexPath = IndexPath()
-    
-    //MARK: - Update Button
-    
-    @IBAction func saveUpdateDataAction(_ sender: UIBarButtonItem) {
-        let cell = notesTableView.dequeueReusableCell(withIdentifier: "cell", for: myIndexPath) as! NoteTableViewCell
-        formatDate.dateFormat = "dd.MM.yy, HH:mm"
-        let currentDate = formatDate.string(from: Date())
-        formatDate.dateFormat = "dd.MM.yy, HH:mm:ss"
-        let fullCurrentDate = formatDate.string(from: Date())
-        update(id: myIndexPath.row, note: cell.newNoteTextView.text, date: currentDate, formData: fullCurrentDate)
+        return myItems.count
     }
     
     //MARK: - cellForRowAt
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        myIndexPath = indexPath
         let cell = notesTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! NoteTableViewCell
-        let notes = notesArray[indexPath.row]
         
-        
-        cell.newNoteTextView?.text = notes.value(forKey: "note") as? String
-        let date = dateArray[indexPath.row]
-        cell.getCurrentTimeLabel?.text = date.value(forKey: "date") as? String
-        cell.newNoteTextView.inputAccessoryView = toolbar
+        cell.textLabel?.text = myItems[indexPath.row].note
+        cell.getCurrentTimeLabel.text = myItems[indexPath.row].date
+
         return cell
     }
     
-//    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//        view.endEditing(true)
-//    }
+    //MARK: - heightForRowAt
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if flag {
-            return 65
+            return 44
         } else {
             return UITableView.automaticDimension
         }
     }
+    
+    //MARK: - canEditRowAt
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         if flag {
@@ -290,33 +299,32 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
+    //MARK: - Added Share Actions
+    
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         let delete = UITableViewRowAction(style: .destructive, title: "Удалить") { (action, indexPath) in
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
             let context = appDelegate.persistentContainer.viewContext
             
-            context.delete(self.notesArray[indexPath.row])
-            context.delete(self.dateArray[indexPath.row])
+            context.delete(self.myItems[indexPath.row])
             
             do {
                 try context.save()
-                self.notesArray.remove(at: indexPath.row)
-                self.dateArray.remove(at: indexPath.row)
+                self.myItems.remove(at: indexPath.row)
                 self.notesTableView.deleteRows(at: [indexPath], with: .automatic)
             } catch {
                 print("Error")
             }
             if self.notesTableView.visibleCells.isEmpty {
-                tableView.beginUpdates()
+                self.myId = 0
                 self.notesTableView.isHidden = true
                 self.noNotesLabel.isHidden = false
                 self.rollUpCellsButton.isHidden = true
-                tableView.endUpdates()
             }
         }
         
         let share = UITableViewRowAction(style: .normal, title: "Отправить") { (action, indexPath) in
-            let notes = self.notesArray[indexPath.row]
+            let notes = self.myItems[indexPath.row]
             let text = notes.value(forKey: "note") as? String
             self.activityViewController = UIActivityViewController(activityItems: [text ?? "nil"], applicationActivities: nil)
             self.present(self.activityViewController!, animated: true, completion: nil)
@@ -326,6 +334,24 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         return [delete, share]
     }
+    
+    //MARK: - Edit Row
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        isEditState = true
+        indexPathId = indexPath.row
+        newNoteTextView.text = myItems[indexPathId].note
+        addNewNoteButton.isHidden = true
+        newNoteTextView.isHidden = false
+        rollUpCellsButton.isHidden = true
+        notesTableView.isHidden = true
+        noNotesLabel.isHidden = true
+        newNoteTextView.becomeFirstResponder()
+        
+    }
+    
+    //MARK: - Deinit NSCenter
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -353,7 +379,7 @@ extension ViewController: UISearchBarDelegate, UISearchDisplayDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if !searchText.isEmpty {
-            notesArray.removeAll(keepingCapacity: false)
+            myItems.removeAll(keepingCapacity: false)
             
             var predicate: NSPredicate = NSPredicate()
             predicate = NSPredicate(format: "note CONTAINS[c] '\(searchText)'")
@@ -364,7 +390,7 @@ extension ViewController: UISearchBarDelegate, UISearchDisplayDelegate {
             fetchRequest.predicate = predicate
             
             do {
-                notesArray = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
+                myItems = try managedObjectContext.fetch(fetchRequest) as! [Notes]
             } catch {
                 print("Error")
             }
