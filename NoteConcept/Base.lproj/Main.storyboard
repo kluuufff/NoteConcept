@@ -17,10 +17,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <containerView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2Hy-Wd-9T1">
-                                <rect key="frame" x="67" y="0.0" width="308" height="397"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                            </containerView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Нет заметок" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bVB-UE-6vP">
                                 <rect key="frame" x="138" y="279.5" width="99.5" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -36,52 +32,6 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="fOG-h3-BSx">
-                                <rect key="frame" x="0.0" y="64" width="375" height="516"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <searchBar key="tableHeaderView" contentMode="redraw" searchBarStyle="minimal" placeholder="Поиск" id="w4I-6q-ENo">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="56"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                    <textInputTraits key="textInputTraits"/>
-                                    <scopeButtonTitles>
-                                        <string>Title</string>
-                                        <string>Title</string>
-                                    </scopeButtonTitles>
-                                </searchBar>
-                                <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" textLabel="L5B-D7-6sR" style="IBUITableViewCellStyleDefault" id="OiR-yi-Rpg" customClass="NoteTableViewCell" customModule="NoteConcept" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="84" width="375" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="OiR-yi-Rpg" id="aFi-Mi-WT9">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="L5B-D7-6sR">
-                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XRh-er-UhM">
-                                                    <rect key="frame" x="280" y="11" width="80" height="14"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                        <connections>
-                                            <outlet property="getCurrentTimeLabel" destination="XRh-er-UhM" id="zyu-yu-Pu4"/>
-                                        </connections>
-                                    </tableViewCell>
-                                </prototypes>
-                                <connections>
-                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="27b-iz-Yt2"/>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="SOV-LK-8qw"/>
-                                </connections>
-                            </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="liU-pc-bMD">
                                 <rect key="frame" x="274" y="588" width="85" height="25"/>
                                 <constraints>
@@ -105,6 +55,62 @@
                                     <action selector="addNewNoteButtonAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="U12-yQ-QWf"/>
                                 </connections>
                             </button>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="fOG-h3-BSx">
+                                <rect key="frame" x="0.0" y="64" width="375" height="516"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <searchBar key="tableHeaderView" contentMode="redraw" searchBarStyle="minimal" placeholder="Поиск" id="w4I-6q-ENo">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="56"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                    <textInputTraits key="textInputTraits"/>
+                                    <scopeButtonTitles>
+                                        <string>Title</string>
+                                        <string>Title</string>
+                                    </scopeButtonTitles>
+                                </searchBar>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" id="OiR-yi-Rpg" customClass="NoteTableViewCell" customModule="NoteConcept" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="84" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="OiR-yi-Rpg" id="aFi-Mi-WT9">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XRh-er-UhM">
+                                                    <rect key="frame" x="280" y="0.0" width="80" height="14"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="80" id="oAn-N3-y62"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8xY-6O-ec5">
+                                                    <rect key="frame" x="15" y="6" width="345" height="37.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="XRh-er-UhM" secondAttribute="trailing" constant="15" id="2db-cZ-zLy"/>
+                                                <constraint firstItem="8xY-6O-ec5" firstAttribute="leading" secondItem="aFi-Mi-WT9" secondAttribute="leading" constant="15" id="PPV-2S-fYY"/>
+                                                <constraint firstItem="8xY-6O-ec5" firstAttribute="top" secondItem="aFi-Mi-WT9" secondAttribute="top" constant="6" id="Sij-rc-ikk"/>
+                                                <constraint firstAttribute="bottom" secondItem="8xY-6O-ec5" secondAttribute="bottom" id="dHa-F3-XgO"/>
+                                                <constraint firstItem="XRh-er-UhM" firstAttribute="top" secondItem="aFi-Mi-WT9" secondAttribute="top" id="gha-pJ-X8n"/>
+                                                <constraint firstAttribute="trailing" secondItem="8xY-6O-ec5" secondAttribute="trailing" constant="15" id="tbt-4O-GJw"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="getCurrentTimeLabel" destination="XRh-er-UhM" id="zyu-yu-Pu4"/>
+                                            <outlet property="newNoteLabel" destination="8xY-6O-ec5" id="DDm-Xx-Fq0"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="27b-iz-Yt2"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="SOV-LK-8qw"/>
+                                </connections>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>

@@ -37,6 +37,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     private var isEditState = false
     private var indexPathId = 0
     private var myId = 0
+    private var lastId = 0
+    private var doneButton = UIBarButtonItem()
+    public var flagRoll = false
     
     //MARK: - viewDidLoad
     
@@ -55,7 +58,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         toolbar.sizeToFit()
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        let doneButton = UIBarButtonItem(title: "Готово", style: .done, target: self, action: #selector(doneButtonAction))
+        doneButton = UIBarButtonItem(title: "Готово", style: .done, target: self, action: #selector(doneButtonAction))
         toolbar.setItems([flexibleSpace, doneButton], animated: false)
         newNoteTextView.inputAccessoryView = toolbar
         
@@ -74,7 +77,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         super.viewWillAppear(animated)
         
         fetch()
-        myId = myItems.first?.id as! Int
+        lastId = Int(truncating: myItems.first?.id ?? 0)
+        myId = lastId
+        print("myId = \(myId)")
         
         //hide empty cells
         if notesTableView.visibleCells.isEmpty {
@@ -123,42 +128,69 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     //MARK: - Touch for Hide Keyboard
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
-        if let newText = newNoteTextView.text {
-            if newText != "" {
-                myId += 1
-                self.save()
+        
+        if isEditState {
+            update()
+            if !notesTableView.visibleCells.isEmpty {
+                notesTableView.isHidden = false
+                noNotesLabel.isHidden = true
+                rollUpCellsButton.isHidden = false
             }
+            view.endEditing(true)
+            newNoteTextView.isHidden = true
+            addNewNoteButton.isHidden = false
+            isEditState = false
+        } else {
+            self.view.endEditing(true)
+            if let newText = newNoteTextView.text {
+                if newText != "" {
+                    myId += 1
+                    self.save()
+                }
+            }
+            if !notesTableView.visibleCells.isEmpty {
+                notesTableView.isHidden = false
+                noNotesLabel.isHidden = true
+                rollUpCellsButton.isHidden = false
+            }
+            newNoteTextView.text = ""
+            newNoteTextView.resignFirstResponder()
+            newNoteTextView.isHidden = true
+            addNewNoteButton.isHidden = false
         }
-        if !notesTableView.visibleCells.isEmpty {
-            notesTableView.isHidden = false
-            noNotesLabel.isHidden = true
-            rollUpCellsButton.isHidden = false
-        }
-        newNoteTextView.text = ""
-        newNoteTextView.resignFirstResponder()
-        newNoteTextView.isHidden = true
-        addNewNoteButton.isHidden = false
+        
     }
     
     //MARK: - Press Done Button for Hide Keyboard
     
     @objc func doneButtonAction() {
-        if let newText = newNoteTextView.text {
-            if newText != "" {
-                myId += 1
-                self.save()
-            }
-        }
-        if !notesTableView.visibleCells.isEmpty {
+        
+        if isEditState {
+            view.endEditing(true)
+            newNoteTextView.isHidden = true
+            addNewNoteButton.isHidden = false
             notesTableView.isHidden = false
-            noNotesLabel.isHidden = true
+            let indexPath = IndexPath(row: indexPathId, section: 0)
+            notesTableView.deselectRow(at: indexPath, animated: false)
             rollUpCellsButton.isHidden = false
+        } else {
+            if let newText = newNoteTextView.text {
+                if newText != "" {
+                    myId += 1
+                    self.save()
+                }
+            }
+            if !notesTableView.visibleCells.isEmpty {
+                notesTableView.isHidden = false
+                noNotesLabel.isHidden = true
+                rollUpCellsButton.isHidden = false
+            }
+            newNoteTextView.text = ""
+            view.endEditing(true)
+            newNoteTextView.isHidden = true
+            addNewNoteButton.isHidden = false
         }
-        newNoteTextView.text = ""
-        view.endEditing(true)
-        newNoteTextView.isHidden = true
-        addNewNoteButton.isHidden = false
+        
     }
     
     //MARK: - Roll All Cells Button
@@ -177,6 +209,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             sender.setTitle("Свернуть все", for: .normal)
         }
         view.endEditing(true)
+        
     }
     
     //MARK: - Save Notes
@@ -223,19 +256,31 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     //MARK: - Update Data ...not work
     
     private func update() {
+        
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = appDelegate.persistentContainer.viewContext
         
         let note = myItems[indexPathId] as NSManagedObject
         
+        formatDate.dateFormat = "dd.MM.yy, HH:mm"
+        let currentDate = formatDate.string(from: Date())
+        
+        fetch()
+        lastId = Int(truncating: myItems.first?.id ?? 0) + 1
+        myId = lastId
+        
         note.setValue(newNoteTextView.text, forKey: "note")
+        note.setValue(currentDate, forKey: "date")
+        note.setValue(myId, forKey: "id")
         
         do {
             try context.save()
-            notesTableView.reloadData()
+            newNoteTextView.text = ""
         } catch {
             print("Error")
         }
+        fetch()
+        notesTableView.reloadData()
     }
     
     //MARK: - Update Button
@@ -273,7 +318,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = notesTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! NoteTableViewCell
         
-        cell.textLabel?.text = myItems[indexPath.row].note
+        cell.newNoteLabel.text = myItems[indexPath.row].note
         cell.getCurrentTimeLabel.text = myItems[indexPath.row].date
 
         return cell
@@ -347,6 +392,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         rollUpCellsButton.isHidden = true
         notesTableView.isHidden = true
         noNotesLabel.isHidden = true
+        doneButton.title = "Отмена"
         newNoteTextView.becomeFirstResponder()
         
     }

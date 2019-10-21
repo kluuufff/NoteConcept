@@ -11,6 +11,7 @@ import UIKit
 class NoteTableViewCell: UITableViewCell {
 
     @IBOutlet weak var getCurrentTimeLabel: UILabel!
+    @IBOutlet weak var newNoteLabel: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -22,5 +23,5 @@ class NoteTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-
+    
 }
